@@ -414,8 +414,8 @@ x = 0
 
 for i in items_selecionados_saida:
     y += 1
-    check_boxes = customtkinter.CTkButton(scroll_saida_produtos, text="🗑️", width=5)
-    check_boxes.grid(row=y, column=3, columnspan=3, pady=5, padx=0)
+    lixo = customtkinter.CTkButton(scroll_saida_produtos, text="🗑️", width=5)
+    lixo.grid(row=y, column=3, columnspan=3, pady=5, padx=0)
 y = 0
 
 botao_saida_cancelar = customtkinter.CTkButton(frame_saida, text="❌Cancelar", fg_color="red", width=115)
