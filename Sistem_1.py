@@ -17,11 +17,13 @@ for i in range(1, 101):
     aleatorio3.append(random.randint(1, 1000))
     aleatoriors.append(random.randint(1, 1000))
 # variaveis globais
+nova_quantidade = None
+
 items = []
 
-items_selecionados_entrada = ["Produto 1", "Produto 2", "Produto 3", "Produto 4"]
+items_selecionados_entrada = []
 
-items_selecionados_saida = ["Produto 1", "Produto 2", "Produto 3", "Produto 4"]
+items_selecionados_saida = []
 
 nomes = []
 
@@ -148,6 +150,20 @@ def checkbox_event_saida(nome, check_var):
             limpador()
             item_selecionado = None
             checkbox_anterior = None
+
+
+def update_entrada():
+    global quantidade, nome_marcado, quantidade_antiga
+    nome_marcado = label_entrada_produto.cget('text')
+    quantidade = int(entrada_entrada_qtde.get())
+    conexao = sqlite3.connect("dados.db")
+    terminal_sql = conexao.cursor()
+    terminal_sql.execute(f"SELECT qtde FROM itens WHERE nome = '{nome_marcado}'")
+    quantidade_antiga = terminal_sql.fetchone()
+    quantidade += int(quantidade_antiga[0])
+    terminal_sql.execute(f"UPDATE itens SET qtde = ? WHERE nome = ?", (quantidade, nome_marcado))
+    conexao.commit()
+    conexao.close()
 
 
 def limpador():
@@ -447,7 +463,7 @@ y = 0
 botao_entrada_cancelar = customtkinter.CTkButton(frame_entrada, text="❌Cancelar", fg_color="red", width=115)
 botao_entrada_cancelar.grid(column=1, row=5, pady=0, padx=10, sticky="w")
 
-botao_entrada_concluir = customtkinter.CTkButton(frame_entrada, text="✔️Concluir", width=115)
+botao_entrada_concluir = customtkinter.CTkButton(frame_entrada, text="✔️Concluir", width=115, command=update_entrada)
 botao_entrada_concluir.grid(column=2, row=5, pady=0, padx=0, sticky="e")
 
 # widget frame tela de relatório
