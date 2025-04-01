@@ -1,0 +1,20 @@
+ampo de busca
+nome 
+quantidade
+botões *4
+exportar
+
+
+f botão
+exportar	estoque	entrada saída
+
+
+3 telas
+estoque			|entrada e saida			|pop-up
+.nome;			|.nome;					|.6 checkbox: exportar : entrada, saida, estoque
+.quantidade;		|.quantidade;				|.tipo de save: word, pdf, exel
+.preço;			|.data/hora;				|
+.descrição		|.4 botões				|
+4 botões: exportar,	|					|
+ entrada, saida, 	|					|
+estoque.		|					|
