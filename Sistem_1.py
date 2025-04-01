@@ -27,8 +27,6 @@ nomes = []
 
 checkbox_anterior = None
 
-
-
 # variaveis de controle
 x = 0
 y = 0
@@ -108,7 +106,8 @@ def exibir_nomes():
         check_boxes.pack(pady=5, padx=10, fill="x")
         check_boxes = customtkinter.CTkCheckBox(scroll_entrada_busca, text=i,
                                                 onvalue=i, offvalue="", variable=check_var,
-                                                command=lambda: seleciona_item(check_var) and checkbox_event_saida() if check_var.get() else None)
+                                                command=lambda: seleciona_item(
+                                                    check_var) and checkbox_event_saida() if check_var.get() else None)
         check_boxes.pack(pady=5, padx=10, fill="x")
 
     items.clear()
@@ -130,7 +129,6 @@ def seleciona_item(arg_item):
     entrada_edicao_descricao.insert("1.0", f"{receber_dados_produto[0][3]}")
     label_saida_item_qdte.configure(text=f"{receber_dados_produto[0][0]} // ({receber_dados_produto[0][1]} un)")
     label_entrada_produto.configure(text=f"{receber_dados_produto[0][0]}")
-
 
 
 def checkbox_event_saida(nome, check_var):
@@ -407,12 +405,6 @@ scroll_saida_produtos.grid_columnconfigure(2, weight=1)
 scroll_saida_produtos.grid(row=3, column=1, padx=10, pady=5, columnspan=3, sticky="nw")
 
 for i in items_selecionados_saida:
-    x += 1
-    check_boxes = customtkinter.CTkLabel(scroll_saida_produtos, text=i)
-    check_boxes.grid(row=x, column=0, pady=5, padx=0)
-x = 0
-
-for i in items_selecionados_saida:
     y += 1
     lixo = customtkinter.CTkButton(scroll_saida_produtos, text="🗑️", width=5)
     lixo.grid(row=y, column=3, columnspan=3, pady=5, padx=0)
@@ -448,15 +440,9 @@ scroll_entrada_produtos.grid_columnconfigure(2, weight=1)
 scroll_entrada_produtos.grid(row=3, column=1, padx=10, pady=5, columnspan=3, sticky="nw")
 
 for i in items_selecionados_entrada:
-    x += 1
-    check_boxes = customtkinter.CTkLabel(scroll_entrada_produtos, text=i)
-    check_boxes.grid(row=x, column=0, pady=5, padx=0)
-x = 0
-
-for i in items_selecionados_entrada:
     y += 1
-    check_boxes = customtkinter.CTkButton(scroll_entrada_produtos, text="🗑️", width=5)
-    check_boxes.grid(row=y, column=3, columnspan=3, pady=5, padx=0)
+    lixo = customtkinter.CTkButton(scroll_entrada_produtos, text="🗑️", width=5)
+    lixo.grid(row=y, column=3, columnspan=3, pady=5, padx=0)
 y = 0
 botao_entrada_cancelar = customtkinter.CTkButton(frame_entrada, text="❌Cancelar", fg_color="red", width=115)
 botao_entrada_cancelar.grid(column=1, row=5, pady=0, padx=10, sticky="w")
