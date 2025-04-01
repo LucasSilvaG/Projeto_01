@@ -166,6 +166,19 @@ def update_entrada():
     conexao.close()
 
 
+def update_saida():
+    global quantidade, nome_marcado, quantidade_antiga
+    nome_marcado = label_entrada_produto.cget('text')
+    quantidade = int(entrada_entrada_qtde.get())
+    conexao = sqlite3.connect("dados.db")
+    terminal_sql = conexao.cursor()
+    terminal_sql.execute(f"SELECT qtde FROM itens WHERE nome = '{nome_marcado}'")
+    quantidade_antiga = terminal_sql.fetchone()
+    quantidade -= int(quantidade_antiga[0])
+    terminal_sql.execute(f"UPDATE itens SET qtde = ? WHERE nome = ?", (quantidade, nome_marcado))
+    conexao.commit()
+    conexao.close()
+
 def limpador():
     entrada_edicao_nome.delete(0, 'end')
     entrada_edicao_preco.delete(0, 'end')
