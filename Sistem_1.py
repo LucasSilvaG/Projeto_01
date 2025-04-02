@@ -167,7 +167,7 @@ def update_entrada():
     conexao.commit()
     conexao.close()
 
-
+# nome de variavel equivocado
 def update_saida():
     global quantidade, nome_marcado, quantidade_antiga
     nome_marcado = label_entrada_produto.cget('text')
