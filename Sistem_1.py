@@ -109,7 +109,7 @@ def exibir_nomes():
         check_boxes = customtkinter.CTkCheckBox(scroll_entrada_busca, text=i,
                                                 onvalue=i, offvalue="", variable=check_var,
                                                 command=lambda: seleciona_item(
-                                                    check_var) if check_var.get() else None)
+                                                    check_var) and checkbox_event_saida() if check_var.get() else None)
         check_boxes.pack(pady=5, padx=10, fill="x")
 
     items.clear()
@@ -133,23 +133,23 @@ def seleciona_item(arg_item):
     label_entrada_produto.configure(text=f"{receber_dados_produto[0][0]}")
 
 
-'''
 def checkbox_event_saida(nome, check_var):
     print("it worked")
     global item_selecionado, checkbox_anterior
+
     if check_var != "":
+
         if checkbox_anterior is not None and checkbox_anterior != check_var:
             checkbox_anterior.set(0)
         seleciona_item(nome)
         item_selecionado = nome
         checkbox_anterior = check_var
+
     else:
         if checkbox_anterior == check_var:
             limpador()
             item_selecionado = None
             checkbox_anterior = None
-checkbox_event_saida()
-'''
 
 
 def update_entrada():
@@ -166,24 +166,18 @@ def update_entrada():
     conexao.close()
 
 
-'''
 def update_saida():
     global quantidade, nome_marcado, quantidade_antiga
-    nome_marcado = 
-    quantidade = int(entrada_saida_qtde.get())
+    nome_marcado = label_entrada_produto.cget('text')
+    quantidade = int(entrada_entrada_qtde.get())
     conexao = sqlite3.connect("dados.db")
     terminal_sql = conexao.cursor()
     terminal_sql.execute(f"SELECT qtde FROM itens WHERE nome = '{nome_marcado}'")
     quantidade_antiga = terminal_sql.fetchone()
-    print(quantidade_antiga)
-    #    quantidade -= int(quantidade_antiga[0])
-    if quantidade < 1:
-        quantidade = 0
+    quantidade -= int(quantidade_antiga[0])
     terminal_sql.execute(f"UPDATE itens SET qtde = ? WHERE nome = ?", (quantidade, nome_marcado))
     conexao.commit()
     conexao.close()
-'''
-
 
 def limpador():
     entrada_edicao_nome.delete(0, 'end')
