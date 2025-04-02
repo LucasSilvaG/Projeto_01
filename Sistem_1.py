@@ -109,7 +109,7 @@ def exibir_nomes():
         check_boxes = customtkinter.CTkCheckBox(scroll_entrada_busca, text=i,
                                                 onvalue=i, offvalue="", variable=check_var,
                                                 command=lambda: seleciona_item(
-                                                    check_var) and checkbox_event_saida() if check_var.get() else None)
+                                                    check_var) if check_var.get() else None)
         check_boxes.pack(pady=5, padx=10, fill="x")
 
     items.clear()
@@ -133,6 +133,7 @@ def seleciona_item(arg_item):
     label_entrada_produto.configure(text=f"{receber_dados_produto[0][0]}")
 
 
+'''
 def checkbox_event_saida(nome, check_var):
     print("it worked")
     global item_selecionado, checkbox_anterior
@@ -150,6 +151,8 @@ def checkbox_event_saida(nome, check_var):
             limpador()
             item_selecionado = None
             checkbox_anterior = None
+
+'''
 
 
 def update_entrada():
@@ -178,6 +181,7 @@ def update_saida():
     terminal_sql.execute(f"UPDATE itens SET qtde = ? WHERE nome = ?", (quantidade, nome_marcado))
     conexao.commit()
     conexao.close()
+
 
 def limpador():
     entrada_edicao_nome.delete(0, 'end')
