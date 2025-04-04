@@ -17,6 +17,8 @@ for i in range(1, 101):
     aleatorio3.append(random.randint(1, 1000))
     aleatoriors.append(random.randint(1, 1000))
 # variaveis globais
+valor_checkbox = None
+
 nova_quantidade = None
 
 items = []
@@ -129,7 +131,8 @@ def seleciona_item(arg_item):
     entrada_edicao_preco.insert(0, f'{float(receber_dados_produto[0][2]): .2f}')
     entrada_edicao_descricao.delete("1.0", 'end')
     entrada_edicao_descricao.insert("1.0", f"{receber_dados_produto[0][3]}")
-    label_saida_item_qdte.configure(text=f"{receber_dados_produto[0][0]} // ({receber_dados_produto[0][1]} un)")
+    label_saida_item.configure(text=f"{receber_dados_produto[0][0]}")
+    label_saida_qdte.configure(text=f" ({receber_dados_produto[0][1]} un)")
     label_entrada_produto.configure(text=f"{receber_dados_produto[0][0]}")
 
 
@@ -154,6 +157,20 @@ def checkbox_event_saida(nome, check_var):
 
 '''
 
+'''
+def update_editar():
+    global nome_marcado, check_var
+    if check_var != "":
+        nome_marcado = check_var
+    print(check_var)
+    conexao = sqlite3.connect("dados.db")
+    terminal_sql = conexao.cursor()
+    terminal_sql.execute(f"UPDATE itens SET nome = ?, preco = ?, descricao = ? WHERE nome = ?", (
+    entrada_edicao_nome.get(), entrada_edicao_preco.get(), entrada_edicao_descricao.get('0.0', 'end'), nome_marcado))
+    conexao.commit()
+    conexao.close()
+'''
+
 
 def update_entrada():
     global quantidade, nome_marcado, quantidade_antiga
@@ -171,16 +188,84 @@ def update_entrada():
 
 def update_saida():
     global quantidade, nome_marcado, quantidade_antiga
-    nome_marcado = label_entrada_produto.cget('text')
-    quantidade = int(entrada_entrada_qtde.get())
+    nome_marcado = label_saida_item.cget('text')
+    quantidade = int(entrada_saida_qtde.get())
     conexao = sqlite3.connect("dados.db")
     terminal_sql = conexao.cursor()
     terminal_sql.execute(f"SELECT qtde FROM itens WHERE nome = '{nome_marcado}'")
     quantidade_antiga = terminal_sql.fetchone()
-    quantidade -= int(quantidade_antiga[0])
-    terminal_sql.execute(f"UPDATE itens SET qtde = ? WHERE nome = ?", (quantidade, nome_marcado))
+    print(int(quantidade_antiga[0]), quantidade)
+    troca_quantidade = int(quantidade_antiga[0])
+    troca_quantidade -= quantidade
+    if troca_quantidade < 1:
+        troca_quantidade = 0
+    terminal_sql.execute(f"UPDATE itens SET qtde = ? WHERE nome = ?", (troca_quantidade, nome_marcado))
     conexao.commit()
     conexao.close()
+
+
+def adicionar_scroll_saida():
+    global nome_marcado, y, x
+
+    def lixinho():
+        nomeqtde.destroy()
+        lixo.destroy()
+
+    nome_marcado = label_saida_item.cget('text')
+    conexao = sqlite3.connect("dados.db")
+    terminal_sql = conexao.cursor()
+    terminal_sql.execute(f"SELECT nome FROM itens WHERE nome = '{nome_marcado}'")
+    nomes = terminal_sql.fetchone()
+    terminal_sql.execute(f"SELECT qtde FROM itens WHERE nome = '{nome_marcado}'")
+    qtde = terminal_sql.fetchone()
+    for i in nomes:
+        items.append(nomes)
+        items_selecionados_saida.append(nomes)
+        print(items_selecionados_saida)
+    for i in items:
+        x += 1
+        nomeqtde = customtkinter.CTkLabel(scroll_saida_produtos, text=f'{i[0]}  ({int(qtde[0])} un)')
+        nomeqtde.grid(row=x, column=1, columnspan=1, pady=5, padx=0)
+    x = 0
+    for i in items_selecionados_saida:
+        y += 1
+        lixo = customtkinter.CTkButton(scroll_saida_produtos, text="🗑️", width=5, command=lixinho)
+        lixo.grid(row=y, column=3, columnspan=3, pady=5, padx=0)
+    y = 0
+    conexao.commit()
+    conexao.close()
+
+
+def erase():
+    global check_var, check_boxes
+    print("working")
+    conexao = sqlite3.connect("dados.db")
+    terminal_sql = conexao.cursor()
+    caixinha = entrada_edicao_nome.get()
+    terminal_sql.execute(f"DELETE FROM itens WHERE nome = '{entrada_edicao_nome.get()}'")
+    entrada_edicao_nome.delete(0, 'end')
+    entrada_edicao_preco.delete(0, 'end')
+    entrada_edicao_descricao.delete('0.0', 'end')
+
+    conexao.commit()
+    conexao.close()
+
+
+def cancelar_editar():
+    entrada_edicao_nome.delete(0, 'end')
+    entrada_edicao_preco.delete(0, 'end')
+    entrada_edicao_descricao.delete('0.0', 'end')
+
+
+def cancelar_saida():
+    label_saida_item.configure(text="")
+    label_saida_qdte.configure(text="")
+    scroll_saida_produtos.destroy()
+
+
+def cancelar_entrada():
+    label_entrada_produto.configure(text="")
+    scroll_entrada_produtos.destroy()
 
 
 def limpador():
@@ -404,10 +489,10 @@ entrada_edicao_preco.grid(row=3, column=1, padx=0, pady=0, sticky="w", columnspa
 entrada_edicao_descricao = customtkinter.CTkTextbox(frame_editar, width=300, height=80)
 entrada_edicao_descricao.grid(row=4, column=1, padx=0, sticky="w", columnspan=3)
 
-botao_edicao_exculir = customtkinter.CTkButton(frame_editar, text="🗑️Excluir", width=80, fg_color="red")
+botao_edicao_exculir = customtkinter.CTkButton(frame_editar, text="🗑️Excluir", width=80, fg_color="red", command=erase)
 botao_edicao_exculir.grid(row=5, column=1, padx=0, pady=10, sticky="w")
 
-botao_edicao_cancelar = customtkinter.CTkButton(frame_editar, text="❌️Cancelar", width=80)
+botao_edicao_cancelar = customtkinter.CTkButton(frame_editar, text="❌️Cancelar", width=80, command=cancelar_editar)
 botao_edicao_cancelar.grid(row=5, column=2, padx=0, pady=10)
 
 botao_edicao_salvar = customtkinter.CTkButton(frame_editar, text="✔️salvar", width=80, fg_color="green")
@@ -423,13 +508,16 @@ entrada_busca_saida.grid(row=1, column=0, pady=0, padx=0)
 scroll_busca_saida = customtkinter.CTkScrollableFrame(frame_saida, width=170, height=200)
 scroll_busca_saida.grid(row=2, column=0, padx=20, pady=10, rowspan=2, sticky="ne")
 
-label_saida_item_qdte = customtkinter.CTkLabel(frame_saida, text="Produto e Quantidade", font=("Arial", 15))
-label_saida_item_qdte.grid(row=1, column=1, columnspan=2, padx=0, pady=5)
+label_saida_item = customtkinter.CTkLabel(frame_saida, text="Produto ", font=("Arial", 15))
+label_saida_item.grid(row=1, column=1, columnspan=2, padx=0, pady=5, sticky="w")
 
+label_saida_qdte = customtkinter.CTkLabel(frame_saida, text="Quantidade", font=("Arial", 15))
+label_saida_qdte.grid(row=1, column=2, columnspan=2, padx=0, pady=5, sticky="e")
 entrada_saida_qtde = customtkinter.CTkEntry(frame_saida, placeholder_text="Quantidade", width=80)
 entrada_saida_qtde.grid(row=2, column=1, padx=10, pady=0, sticky="w")
 
-botao_saida_adicionar = customtkinter.CTkButton(frame_saida, text="➕Adicionar Item", width=130, fg_color="green")
+botao_saida_adicionar = customtkinter.CTkButton(frame_saida, text="➕Adicionar Item", width=130, fg_color="green",
+                                                command=adicionar_scroll_saida)
 botao_saida_adicionar.grid(row=2, column=2, padx=0, sticky="e")
 
 scroll_saida_produtos = customtkinter.CTkScrollableFrame(frame_saida, width=250, height=100)
@@ -443,10 +531,11 @@ for i in items_selecionados_saida:
     lixo.grid(row=y, column=3, columnspan=3, pady=5, padx=0)
 y = 0
 
-botao_saida_cancelar = customtkinter.CTkButton(frame_saida, text="❌Cancelar", fg_color="red", width=115)
+botao_saida_cancelar = customtkinter.CTkButton(frame_saida, text="❌Cancelar", fg_color="red", width=115,
+                                               command=cancelar_saida)
 botao_saida_cancelar.grid(column=1, row=5, pady=0, padx=10, sticky="w")
 
-botao_saida_concluir = customtkinter.CTkButton(frame_saida, text="✔️Concluir", width=115)
+botao_saida_concluir = customtkinter.CTkButton(frame_saida, text="✔️Concluir", width=115, command=update_saida)
 botao_saida_concluir.grid(column=2, row=5, pady=0, padx=0, sticky="e")
 
 # widget frame tela de entrada de produto
@@ -474,10 +563,12 @@ scroll_entrada_produtos.grid(row=3, column=1, padx=10, pady=5, columnspan=3, sti
 
 for i in items_selecionados_entrada:
     y += 1
+    nomeqtde = customtkinter.CTkLabel(janela, texte="")
     lixo = customtkinter.CTkButton(scroll_entrada_produtos, text="🗑️", width=5)
     lixo.grid(row=y, column=3, columnspan=3, pady=5, padx=0)
 y = 0
-botao_entrada_cancelar = customtkinter.CTkButton(frame_entrada, text="❌Cancelar", fg_color="red", width=115)
+botao_entrada_cancelar = customtkinter.CTkButton(frame_entrada, text="❌Cancelar", fg_color="red", width=115,
+                                                 command=cancelar_entrada)
 botao_entrada_cancelar.grid(column=1, row=5, pady=0, padx=10, sticky="w")
 
 botao_entrada_concluir = customtkinter.CTkButton(frame_entrada, text="✔️Concluir", width=115, command=update_entrada)
